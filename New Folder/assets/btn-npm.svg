@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="152" height="40" viewBox="0 0 152 40" role="img" aria-label="View on npm">
+  <title>View on npm</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00838a"/>
+      <stop offset="1" stop-color="#3a9fc4"/>
+    </linearGradient>
+  </defs>
+  <rect width="152" height="40" rx="20" fill="url(#g)"/>
+  <text x="26" y="25" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="13" font-weight="bold" fill="#ffffff">View on npm</text>
+  <g fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(118 12)">
+    <path d="M2 14 L14 2"/><path d="M5 2 H14 V11"/>
+  </g>
+</svg>

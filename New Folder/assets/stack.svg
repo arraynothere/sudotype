@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="852" height="200" viewBox="0 0 852 200" role="img" aria-label="Programs used by SudoType">
+  <title>Programs used by SudoType</title>
+  <defs>
+    <linearGradient id="t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#98d8fa"/><stop offset="1" stop-color="#00a3a8"/></linearGradient>
+  </defs>
+  <rect x="1" y="1" width="850" height="198" rx="16" fill="#0b1f24" stroke="#1d4a54" stroke-width="2"/>
+  <text x="28" y="40" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="13" font-weight="bold" letter-spacing="2" fill="url(#t)">BUILT WITH</text>
+  <g transform="translate(24 62)">
+    <rect width="195" height="112" rx="12" fill="#123038" stroke="#1d4a54"/>
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#3178c6"/>
+    <text x="36" y="42" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">TS</text>
+    <text x="68" y="33" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff">tsx</text>
+    <text x="68" y="50" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#8fb3bb">Runtime</text>
+    <rect x="16" y="72" width="70" height="24" rx="12" fill="#0b1f24" stroke="#00838a"/>
+    <text x="51.0" y="88" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="11" fill="#98d8fa" text-anchor="middle">^4.19.0</text>
+  </g>
+  <g transform="translate(231 62)">
+    <rect width="195" height="112" rx="12" fill="#123038" stroke="#1d4a54"/>
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#d9a300"/>
+    <text x="36" y="42" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">es</text>
+    <text x="68" y="33" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff">esbuild</text>
+    <text x="68" y="50" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#8fb3bb">Compiler &amp; bundler</text>
+    <rect x="16" y="72" width="70" height="24" rx="12" fill="#0b1f24" stroke="#00838a"/>
+    <text x="51.0" y="88" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="11" fill="#98d8fa" text-anchor="middle">^0.25.0</text>
+  </g>
+  <g transform="translate(438 62)">
+    <rect width="195" height="112" rx="12" fill="#123038" stroke="#1d4a54"/>
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#3c873a"/>
+    <text x="36" y="42" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">JS</text>
+    <text x="68" y="33" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff">Node.js</text>
+    <text x="68" y="50" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#8fb3bb">Platform</text>
+    <rect x="16" y="72" width="63" height="24" rx="12" fill="#0b1f24" stroke="#00838a"/>
+    <text x="47.5" y="88" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="11" fill="#98d8fa" text-anchor="middle">&gt;=20.12</text>
+  </g>
+  <g transform="translate(645 62)">
+    <rect width="195" height="112" rx="12" fill="#123038" stroke="#1d4a54"/>
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#3178c6"/>
+    <text x="36" y="42" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">TS</text>
+    <text x="68" y="33" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="15" font-weight="bold" fill="#ffffff">TypeScript</text>
+    <text x="68" y="50" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#8fb3bb">Type-checking</text>
+    <rect x="16" y="72" width="99" height="24" rx="12" fill="#0b1f24" stroke="#00838a"/>
+    <text x="65.5" y="88" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="11" fill="#98d8fa" text-anchor="middle">project dep</text>
+  </g>
+</svg>
