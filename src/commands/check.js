@@ -1,18 +1,13 @@
 'use strict';
 const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
-const { fail, findPackageRoot, log } = require('../utils');
+const { log } = require('../utils');
+const { check } = require('../core/check');
 
-module.exports = async function check(argv) {
-  const root = findPackageRoot('typescript', process.cwd());
-  if (!root) {
-    fail('TypeScript is not installed in this project.\nInstall it with: npm install -D typescript @types/node');
-  }
+module.exports = async function checkCommand(argv) {
   if (!fs.existsSync('tsconfig.json')) {
     log.warn('No tsconfig.json found. Create one with: sudotype tsconfig');
   }
-  const res = spawnSync(process.execPath, [path.join(root, 'bin', 'tsc'), '--noEmit', ...argv], { stdio: 'inherit' });
-  if (res.status === 0) log.ok('No type errors found.');
-  process.exit(res.status == null ? 1 : res.status);
+  const result = await check({ args: argv });
+  if (result.success) log.ok('No type errors found.');
+  process.exit(result.exitCode);
 };
