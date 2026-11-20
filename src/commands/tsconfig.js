@@ -1,13 +1,9 @@
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const { log, fail } = require('../utils');
+const { log } = require('../utils');
+const { writeTsconfig } = require('../core/tsconfig');
 
-module.exports = async function tsconfig(argv) {
+module.exports = async function tsconfigCommand(argv) {
   const force = argv.includes('--force') || argv.includes('-f');
-  if (fs.existsSync('tsconfig.json') && !force) {
-    fail('tsconfig.json already exists. Use --force to overwrite.');
-  }
-  fs.copyFileSync(path.join(__dirname, '..', '..', 'tsconfig.base.json'), 'tsconfig.json');
+  writeTsconfig({ force });
   log.ok('Created tsconfig.json');
 };

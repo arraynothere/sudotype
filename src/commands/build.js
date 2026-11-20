@@ -1,10 +1,10 @@
 'use strict';
-const fs = require('fs');
 const path = require('path');
 const { parseArgs } = require('node:util');
-const { log, fail, readJSON, color } = require('../utils');
+const { log, color } = require('../utils');
+const { build } = require('../core/build');
 
-module.exports = async function build(argv) {
+module.exports = async function buildCommand(argv) {
   const { values, positionals } = parseArgs({
     args: argv,
     allowPositionals: true,
@@ -31,38 +31,18 @@ module.exports = async function build(argv) {
   --bundle-deps         Also bundle node_modules into the output`);
   }
 
-  const entry = positionals[0] || 'src/index.ts';
-  if (!fs.existsSync(entry)) fail(`Entry file not found: ${entry}`);
-
-  let esbuild;
-  try {
-    esbuild = require('esbuild');
-  } catch (e) {
-    fail('esbuild failed to load. Run "sudotype doctor" for details.');
-  }
-
-  const pkg = readJSON(path.join(process.cwd(), 'package.json')) || {};
-  const isModule = pkg.type === 'module';
-  const format = values.format || (isModule ? 'esm' : 'cjs');
-  if (!['esm', 'cjs'].includes(format)) fail('Format must be "esm" or "cjs".');
-
-  const ext = isModule ? (format === 'esm' ? '.js' : '.cjs') : format === 'cjs' ? '.js' : '.mjs';
-  const outfile = values.out || path.join('dist', path.basename(entry).replace(/\.[cm]?[jt]sx?$/, '') + ext);
-
-  const started = Date.now();
-  await esbuild.build({
-    entryPoints: [entry],
-    outfile,
-    bundle: true,
-    platform: 'node',
-    format,
+  const result = await build({
+    entry: positionals[0],
+    out: values.out,
+    format: values.format,
     target: values.target,
     minify: values.minify,
     sourcemap: values.sourcemap,
-    packages: values['bundle-deps'] ? undefined : 'external',
+    bundleDeps: values['bundle-deps'],
     logLevel: 'warning',
   });
 
-  const kb = (fs.statSync(outfile).size / 1024).toFixed(1);
-  log.ok(`Built ${color.bold(outfile)} (${kb} KB) in ${Date.now() - started}ms`);
+  const shown = values.out || path.relative(process.cwd(), result.outfile);
+  const kb = (result.size / 1024).toFixed(1);
+  log.ok(`Built ${color.bold(shown)} (${kb} KB) in ${result.duration}ms`);
 };

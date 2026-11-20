@@ -4,8 +4,8 @@
 
 <h1>SudoType</h1>
 
-<p><b>Zero-config TypeScript toolchain for any Environment.</b><br>
-Run, build, scaffold and type-check TypeScript with a single command.</p>
+<p><b>Zero-config TypeScript toolchain for any environment.</b><br>
+Run, build, scaffold and type-check TypeScript with a single command, or call the same features from your own code through a fully typed API.</p>
 
 <p>
   <img src="https://raw.githubusercontent.com/arraynothere/sudotype/main/assets/badge-version.svg" alt="version">
@@ -18,7 +18,7 @@ Run, build, scaffold and type-check TypeScript with a single command.</p>
 
 <p>
   <a href="https://github.com/arraynothere/sudotype"><img src="https://raw.githubusercontent.com/arraynothere/sudotype/main/assets/btn-repo.svg" alt="Visit Repository" height="40"></a>
-  <a href="https://www.npmjs.com/package/sudotype"><img src="https://raw.githubusercontent.com/arraynothere/sudotype/main/assets/btn-npm.svg" alt="View on npm" height="40"></a>
+  <a href="https://www.npmjs.com/package/@arraynothere/sudotype"><img src="https://raw.githubusercontent.com/arraynothere/sudotype/main/assets/btn-npm.svg" alt="View on npm" height="40"></a>
   <a href="https://github.com/arraynothere/sudotype/issues"><img src="https://raw.githubusercontent.com/arraynothere/sudotype/main/assets/btn-issues.svg" alt="Report an Issue" height="40"></a>
 </p>
 
@@ -26,6 +26,7 @@ Run, build, scaffold and type-check TypeScript with a single command.</p>
   <a href="#installation">Installation</a> ·
   <a href="#quick-start">Quick Start</a> ·
   <a href="#commands">Commands</a> ·
+  <a href="#programmatic-api">API</a> ·
   <a href="#templates">Templates</a> ·
   <a href="#project-structure">Structure</a> ·
   <a href="#troubleshooting">Troubleshooting</a> ·
@@ -53,6 +54,10 @@ Setting up TypeScript on a phone usually means writing a <code>tsconfig.json</co
   <tr>
     <td width="50%"><b>Fast compile</b><br>Bundle to a single JavaScript file with esbuild.</td>
     <td width="50%"><b>Environment check</b><br><code>sudotype doctor</code> reports what is missing.</td>
+  </tr>
+  <tr>
+    <td width="50%"><b>Typed programmatic API</b><br>Import <code>build</code>, <code>init</code>, <code>check</code> and more from TypeScript.</td>
+    <td width="50%"><b>Works anywhere</b><br>Termux, Linux, macOS and Windows on Node.js 20.12+.</td>
   </tr>
 </table>
 
@@ -91,26 +96,34 @@ CI runs the test suite on Ubuntu, macOS and Windows with Node.js 20, 22 and 24.
 
 ```sh
 pkg update && pkg install nodejs git
-npm install -g sudotype
+npm install -g @arraynothere/sudotype
 ```
 
 **Linux / macOS / Windows**
 
 ```sh
-npm install -g sudotype
+npm install -g @arraynothere/sudotype
 ```
+
+The npm package is `@arraynothere/sudotype`, and the command it installs is `sudotype`.
 
 Or run it without installing:
 
 ```sh
-npx sudotype doctor
+npx @arraynothere/sudotype doctor
+```
+
+**As a library** (to use the [API](#programmatic-api) in your own project)
+
+```sh
+npm install @arraynothere/sudotype
 ```
 
 Update or remove it:
 
 ```sh
-npm update -g sudotype
-npm uninstall -g sudotype
+npm update -g @arraynothere/sudotype
+npm uninstall -g @arraynothere/sudotype
 ```
 
 Verify the setup:
@@ -192,7 +205,7 @@ sudotype build src/index.ts --bundle-deps   # single self-contained file
     <tr><th align="left">Option</th><th align="left">Default</th><th align="left">Description</th></tr>
   </thead>
   <tbody>
-    <tr><td><code>-o, --out &lt;file&gt;</code></td><td><code>dist/&lt;name&gt;.js</code></td><td>Output file</td></tr>
+    <tr><td><code>-o, --out &lt;file&gt;</code></td><td><code>dist/&lt;name&gt;.js</code> (<code>.cjs</code> / <code>.mjs</code> when the format differs from <code>"type"</code>)</td><td>Output file</td></tr>
     <tr><td><code>-f, --format &lt;esm|cjs&gt;</code></td><td>from <code>package.json</code> <code>"type"</code></td><td>Output module format</td></tr>
     <tr><td><code>--target &lt;target&gt;</code></td><td><code>node20</code></td><td>esbuild target</td></tr>
     <tr><td><code>--minify</code></td><td>off</td><td>Minify the output</td></tr>
@@ -229,6 +242,203 @@ sudotype check                  # requires typescript in the project
 sudotype tsconfig               # fails if tsconfig.json exists
 sudotype tsconfig --force       # overwrite
 sudotype doctor                 # exit code 1 if a problem is found
+```
+
+<h2 id="programmatic-api">Programmatic API</h2>
+
+Everything the CLI does is also available as a typed API. The package ships its own type definitions, so no `@types/*` package is needed for SudoType itself (your project still needs `@types/node`, which TypeScript projects on Node.js normally have).
+
+```sh
+npm install @arraynothere/sudotype
+```
+
+```ts
+import { build, check, doctor, init, listTemplates, SudoTypeError } from "@arraynothere/sudotype";
+
+// Scaffold a project
+const project = await init({ name: "my-api", template: "express", git: false });
+console.log(project.directory);
+
+// Bundle a file
+const result = await build({ cwd: project.directory, entry: "src/index.ts", minify: true });
+console.log(`${result.outfile} (${result.size} bytes in ${result.duration}ms)`);
+
+// Type-check and capture the output
+const { success, output } = await check({ cwd: project.directory, silent: true });
+if (!success) console.error(output);
+```
+
+CommonJS works too:
+
+```js
+const { build } = require("@arraynothere/sudotype");
+```
+
+Differences from the CLI:
+
+- API functions **never call `process.exit()` and never print**. They return a result or throw a `SudoTypeError`.
+- Paths are resolved against the `cwd` option (default `process.cwd()`).
+- `build()` is silent by default. Pass `logLevel: "warning"` to see esbuild warnings.
+- `init()` does not prompt. Interactive prompts exist only in the CLI.
+- Requires Node.js 20.12 or newer, like the CLI.
+
+<h3>Functions</h3>
+
+<table>
+  <thead>
+    <tr><th align="left">Function</th><th align="left">Returns</th><th align="left">Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>build(options?)</code></td><td><code>Promise&lt;BuildResult&gt;</code></td><td>Bundle a TypeScript entry file with esbuild</td></tr>
+    <tr><td><code>check(options?)</code></td><td><code>Promise&lt;CheckResult&gt;</code></td><td>Run <code>tsc --noEmit</code> with the project's TypeScript</td></tr>
+    <tr><td><code>doctor(options?)</code></td><td><code>Promise&lt;DoctorReport&gt;</code></td><td>Inspect the environment</td></tr>
+    <tr><td><code>init(options)</code></td><td><code>Promise&lt;InitResult&gt;</code></td><td>Scaffold a project from a template</td></tr>
+    <tr><td><code>listTemplates()</code></td><td><code>TemplateInfo[]</code></td><td>List the built-in templates</td></tr>
+    <tr><td><code>installDependencies(dir, options?)</code></td><td><code>Promise&lt;boolean&gt;</code></td><td>Run <code>npm install</code> in a directory</td></tr>
+    <tr><td><code>writeTsconfig(options?)</code></td><td><code>{ path: string }</code></td><td>Write the recommended <code>tsconfig.json</code></td></tr>
+    <tr><td><code>run(file, args?, options?)</code></td><td><code>Promise&lt;number&gt;</code></td><td>Run a file with tsx, resolves to the exit code</td></tr>
+    <tr><td><code>watch(file, args?, options?)</code></td><td><code>Promise&lt;number&gt;</code></td><td>Run a file and restart on changes</td></tr>
+    <tr><td><code>version</code></td><td><code>string</code></td><td>Installed SudoType version</td></tr>
+    <tr><td><code>SudoTypeError</code></td><td>class</td><td>Error type thrown by every function</td></tr>
+  </tbody>
+</table>
+
+<h3>build(options?)</h3>
+
+<table>
+  <thead>
+    <tr><th align="left">Option</th><th align="left">Type</th><th align="left">Default</th><th align="left">Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>entry</code></td><td><code>string</code></td><td><code>"src/index.ts"</code></td><td>Entry file</td></tr>
+    <tr><td><code>out</code></td><td><code>string</code></td><td><code>dist/&lt;name&gt;.js</code></td><td>Output file</td></tr>
+    <tr><td><code>format</code></td><td><code>"esm" | "cjs"</code></td><td>from <code>"type"</code></td><td>Module format</td></tr>
+    <tr><td><code>target</code></td><td><code>string</code></td><td><code>"node20"</code></td><td>esbuild target</td></tr>
+    <tr><td><code>minify</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Minify the output</td></tr>
+    <tr><td><code>sourcemap</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Emit a source map</td></tr>
+    <tr><td><code>bundleDeps</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Bundle <code>node_modules</code></td></tr>
+    <tr><td><code>cwd</code></td><td><code>string</code></td><td><code>process.cwd()</code></td><td>Working directory</td></tr>
+    <tr><td><code>logLevel</code></td><td><code>"silent" | "error" | "warning" | "info"</code></td><td><code>"silent"</code></td><td>esbuild log level</td></tr>
+  </tbody>
+</table>
+
+Result: `{ entry, outfile, format, size, duration }`. `entry` and `outfile` are absolute paths, `size` is in bytes and `duration` in milliseconds.
+
+<h3>check(options?)</h3>
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `cwd` | `string` | `process.cwd()` | Project directory |
+| `args` | `string[]` | `[]` | Extra arguments for `tsc` |
+| `silent` | `boolean` | `false` | Capture output in `result.output` instead of printing it |
+
+Result: `{ success, exitCode, output }`. A project with type errors resolves with `success: false`. It only rejects when TypeScript is missing or cannot start.
+
+<h3>doctor(options?)</h3>
+
+```ts
+const report = await doctor();
+// {
+//   platform: "linux", arch: "x64", termux: false,
+//   ok: true, problems: 0,
+//   checks: [{ id: "node", status: "ok", message: "Node.js v22.0.0" }, ...]
+// }
+```
+
+Each check has an `id` (`node`, `esbuild`, `tsx`, `typescript`, `git`), a `status` (`ok`, `warn` or `error`), a `message` and an optional `hint`. Only `error` counts as a problem.
+
+<h3>init(options)</h3>
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | required | Project and directory name |
+| `template` | `"basic" \| "express" \| "discord" \| "cli"` | `"basic"` | Template to use |
+| `cwd` | `string` | `process.cwd()` | Parent directory |
+| `git` | `boolean` | `true` | Run `git init` |
+| `install` | `boolean` | `false` | Run `npm install` afterwards |
+| `silent` | `boolean` | `false` | Hide npm output |
+
+Result: `{ name, template, directory, installed }`.
+
+<h3>run / watch</h3>
+
+```ts
+import { run, watch } from "@arraynothere/sudotype";
+
+const code = await run("src/index.ts", ["--port", "8080"]);
+
+const controller = new AbortController();
+const done = watch("src/index.ts", [], { signal: controller.signal });
+controller.abort();          // stop watching
+await done.catch(() => {});  // an aborted process rejects with code "ABORTED"
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `cwd` | `string` | `process.cwd()` | Working directory |
+| `env` | `NodeJS.ProcessEnv` | `process.env` | Environment variables |
+| `stdio` | `"inherit" \| "pipe" \| "ignore"` | `"inherit"` | Child stdio |
+| `signal` | `AbortSignal` | none | Stops the process when aborted |
+| `onSpawn` | `(child: ChildProcess) => void` | none | Called with the child process after it starts |
+
+<h3>Error handling</h3>
+
+Every function throws (or rejects with) a `SudoTypeError`. Branch on `error.code`, not on the message:
+
+```ts
+import { build, SudoTypeError } from "@arraynothere/sudotype";
+
+try {
+  await build({ entry: "src/missing.ts" });
+} catch (err) {
+  if (err instanceof SudoTypeError && err.code === "ENTRY_NOT_FOUND") {
+    console.error(err.message);
+  } else {
+    throw err;
+  }
+}
+```
+
+<table>
+  <thead>
+    <tr><th align="left">Code</th><th align="left">Thrown by</th><th align="left">Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>ENTRY_NOT_FOUND</code></td><td><code>build</code></td><td>The entry file does not exist</td></tr>
+    <tr><td><code>ESBUILD_UNAVAILABLE</code></td><td><code>build</code></td><td>esbuild failed to load (run <code>doctor</code>)</td></tr>
+    <tr><td><code>INVALID_FORMAT</code></td><td><code>build</code></td><td><code>format</code> is not <code>"esm"</code> or <code>"cjs"</code></td></tr>
+    <tr><td><code>BUILD_FAILED</code></td><td><code>build</code></td><td>esbuild reported errors (see <code>error.cause</code>)</td></tr>
+    <tr><td><code>TYPESCRIPT_NOT_INSTALLED</code></td><td><code>check</code></td><td>The project has no <code>typescript</code> package</td></tr>
+    <tr><td><code>INVALID_NAME</code></td><td><code>init</code></td><td>Missing or invalid project name</td></tr>
+    <tr><td><code>UNKNOWN_TEMPLATE</code></td><td><code>init</code></td><td>The template does not exist</td></tr>
+    <tr><td><code>DIRECTORY_NOT_EMPTY</code></td><td><code>init</code></td><td>The target directory already has files</td></tr>
+    <tr><td><code>TEMPLATE_MISSING</code></td><td><code>init</code></td><td>Template files are missing, reinstall SudoType</td></tr>
+    <tr><td><code>TSCONFIG_EXISTS</code></td><td><code>writeTsconfig</code></td><td><code>tsconfig.json</code> exists and <code>force</code> is not set</td></tr>
+    <tr><td><code>FILE_NOT_FOUND</code></td><td><code>run</code>, <code>watch</code></td><td>The file does not exist</td></tr>
+    <tr><td><code>INVALID_ARGUMENT</code></td><td><code>run</code>, <code>watch</code></td><td>No file was given</td></tr>
+    <tr><td><code>TSX_NOT_FOUND</code></td><td><code>run</code>, <code>watch</code></td><td>tsx is missing, reinstall SudoType</td></tr>
+    <tr><td><code>SPAWN_FAILED</code></td><td><code>check</code>, <code>run</code>, <code>watch</code></td><td>The child process could not start</td></tr>
+    <tr><td><code>ABORTED</code></td><td><code>run</code>, <code>watch</code></td><td>The <code>signal</code> option aborted the process</td></tr>
+  </tbody>
+</table>
+
+<h3>TypeScript configuration</h3>
+
+SudoType's types use the `exports` field, so use a modern module resolution mode:
+
+```json
+{
+  "compilerOptions": {
+    "module": "Node16",
+    "moduleResolution": "Node16"
+  }
+}
+```
+
+`"moduleResolution": "Bundler"` works as well. The generated `tsconfig.json` from `sudotype tsconfig` already uses a compatible setup. All types (`BuildOptions`, `BuildResult`, `CheckResult`, `DoctorReport`, `InitOptions`, `RunOptions`, `TemplateName`, ...) are exported:
+
+```ts
+import type { BuildOptions, DoctorReport } from "@arraynothere/sudotype";
 ```
 
 <h2 id="templates">Templates</h2>
@@ -286,12 +496,18 @@ sudotype/
 ├── bin/
 │   └── sudotype.js         CLI entry point
 ├── src/
+│   ├── index.js            programmatic API entry (package "main")
+│   ├── index.d.ts          type definitions for the API
+│   ├── errors.js           SudoTypeError
+│   ├── core/               API implementation (no printing, no process.exit)
 │   ├── cli.js              command dispatcher
 │   ├── utils.js            shared helpers
-│   └── commands/           run, build, init, check, tsconfig, doctor
+│   └── commands/           CLI adapters: run, build, init, check, tsconfig, doctor
 ├── templates/              basic, express, discord, cli
 ├── test/
-│   └── smoke.test.js
+│   ├── smoke.test.js       CLI tests
+│   ├── api.test.js         programmatic API tests
+│   └── types/              type-definition tests (tsc)
 ├── assets/                 README badges and graphics
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -308,7 +524,7 @@ sudotype/
 
 ```sh
 pkg upgrade
-npm install -g sudotype --force
+npm install -g @arraynothere/sudotype --force
 sudotype doctor
 ```
 
@@ -351,7 +567,7 @@ npm install -D typescript @types/node
 
 ```sh
 npm config get prefix           # the bin folder must be in PATH
-npm install -g sudotype
+npm install -g @arraynothere/sudotype
 ```
 
 </details>
@@ -378,13 +594,26 @@ Bun does not run natively on Termux because it needs glibc. tsx and esbuild work
 Yes. SudoType runs on any system with Node.js 20.12 or newer, including Linux, macOS and Windows. See <a href="#requirements">Supported platforms</a>.
 </details>
 
+<details>
+<summary><b>Can I use SudoType from my own code?</b></summary>
+<br>
+Yes. <code>npm install @arraynothere/sudotype</code> and import the functions, see the <a href="#programmatic-api">Programmatic API</a>. The CLI is a thin layer on top of the same functions.
+</details>
+
+<details>
+<summary><b>Do I need to install tsx or esbuild myself?</b></summary>
+<br>
+No. Both are dependencies of SudoType. <code>check</code> is the exception: it uses the <code>typescript</code> package of your own project.
+</details>
+
 <h2 id="contributing">Contributing</h2>
 
 ```sh
 git clone https://github.com/arraynothere/sudotype.git
 cd sudotype
 npm install
-npm test
+npm test              # CLI and API tests
+npm run test:types    # type definitions
 node bin/sudotype.js doctor
 ```
 

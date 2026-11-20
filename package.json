@@ -1,7 +1,7 @@
 {
-  "name": "sudotype",
-  "version": "1.0.1",
-  "description": "Zero-config TypeScript toolchain for any Environment.",
+  "name": "@arraynothere/sudotype",
+  "version": "1.1.0",
+  "description": "Zero-config TypeScript toolchain and typed API for any environment.",
   "keywords": [
     "typescript",
     "termux",
@@ -10,7 +10,8 @@
     "tsx",
     "esbuild",
     "toolchain",
-    "scaffold"
+    "scaffold",
+    "api"
   ],
   "license": "MIT",
   "author": "Array",
@@ -25,7 +26,15 @@
   "bin": {
     "sudotype": "bin/sudotype.js"
   },
-  "main": "src/cli.js",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "bin",
     "src",
@@ -38,12 +47,20 @@
   "engines": {
     "node": ">=20.12.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "test": "node --test test/smoke.test.js",
-    "prepublishOnly": "npm test"
+    "test": "node --test test/smoke.test.js test/api.test.js",
+    "test:types": "tsc -p test/types/tsconfig.json",
+    "prepublishOnly": "npm test && npm run test:types"
   },
   "dependencies": {
     "esbuild": "^0.25.0",
     "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
   }
 }
