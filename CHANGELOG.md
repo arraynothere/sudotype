@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1
+- Release workflow fix: npm publish now authenticates with NPM_TOKEN.
+
 ## 1.1.0
 - New: typed programmatic API. `import { build, check, doctor, init, listTemplates, installDependencies, writeTsconfig, run, watch, SudoTypeError, version } from "sudotype"` (ESM and CommonJS).
 - New: bundled type definitions (`src/index.d.ts`) and an `exports` map. `package.json` `main` now points to the API instead of the CLI.
